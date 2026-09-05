@@ -8,6 +8,7 @@ The core product idea is:
 
 > **Turn a customer conversation into a bounded, explainable, and auditable transaction.**
 
+
 ---
 
 ## 🚀 What AI Commerce OS Does
