@@ -1,46 +1,72 @@
-AI Commerce OS — Phase 5
-Razorpay AI Buildathon 2026 · Track 01 — AI Growth & Agentic Commerce
-AI Commerce OS is an AI-powered commerce platform that turns a natural-language customer conversation into a controlled shopping journey: product discovery → recommendation → upsell/cross-sell → cart → permission gate → checkout → payment → audit trail → revenue analytics.
+# AI Commerce OS — Phase 5
+
+> **Razorpay AI Buildathon 2026 · Track 01 — AI Growth & Agentic Commerce**
+
+**AI Commerce OS** is an AI-powered commerce platform that turns a natural-language customer conversation into a controlled shopping journey: product discovery → recommendation → upsell/cross-sell → cart → permission gate → checkout → payment → audit trail → revenue analytics.
+
 The core product idea is:
-Turn a customer conversation into a bounded, explainable, and auditable transaction.
-🚀 What AI Commerce OS Does
+
+> **Turn a customer conversation into a bounded, explainable, and auditable transaction.**
+
+---
+
+## 🚀 What AI Commerce OS Does
+
 AI Commerce OS is designed for merchants who want an AI agent to participate in the sales journey without giving the agent unlimited control over business or financial actions.
-Customer side
-Conversational product discovery
-Product search and filtering
-Product comparison
-AI recommendations
-Upselling
-Cross-selling
-Cart creation and modification
-Checkout initiation
-Multi-language commerce support including English, Tamil and Tanglish
-Payment success/failure and retry flows
-Merchant side
-Product catalog management
-AI provider configuration
-Permission and spending limits
-Human approval controls
-Workflow builder
-Workflow execution
-AI architecture analysis
-Audit timeline
-Payment/order management
-Revenue analytics
-Admin and usage monitoring
-Safety and control
-The AI agent does not receive unlimited financial authority.
+
+### Customer side
+
+- Conversational product discovery
+- Product search and filtering
+- Product comparison
+- AI recommendations
+- Upselling
+- Cross-selling
+- Cart creation and modification
+- Checkout initiation
+- Multi-language commerce support including English, Tamil and Tanglish
+- Payment success/failure and retry flows
+
+### Merchant side
+
+- Product catalog management
+- AI provider configuration
+- Permission and spending limits
+- Human approval controls
+- Workflow builder
+- Workflow execution
+- AI architecture analysis
+- Audit timeline
+- Payment/order management
+- Revenue analytics
+- Admin and usage monitoring
+
+### Safety and control
+
+The AI agent does **not** receive unlimited financial authority.
+
 Financial capabilities are deny-by-default and can be bounded by:
-capability permissions
-maximum payment amount
-maximum refund amount
-approval requirements
-customer confirmation
-audit logging
-🧠 Core Concept
+
+- capability permissions
+- maximum payment amount
+- maximum refund amount
+- approval requirements
+- customer confirmation
+- audit logging
+
+---
+
+# 🧠 Core Concept
+
 Traditional e-commerce:
+
+```text
 Search → Product Page → Compare → Cart → Checkout → Payment
+```
+
 AI Commerce OS:
+
+```text
 Customer Conversation
         ↓
 AI understands intent
@@ -64,9 +90,17 @@ Checkout
 Payment
         ↓
 Audit + Analytics
-The AI becomes a commerce agent, not just a chatbot.
-🧊 3D-Style Working Flow
+```
+
+The AI becomes a **commerce agent**, not just a chatbot.
+
+---
+
+# 🧊 3D-Style Working Flow
+
 The following Mermaid diagram represents the platform as a layered 3D-style flow. GitHub renders Mermaid diagrams directly in supported Markdown views.
+
+```mermaid
 flowchart TB
 
     subgraph L1["① CUSTOMER EXPERIENCE"]
@@ -128,9 +162,16 @@ flowchart TB
     Q --> R
     R --> S
     R --> T
-🏗️ 3D-Style System Architecture
+```
+
+---
+
+# 🏗️ 3D-Style System Architecture
+
 The architecture is separated into five conceptual layers.
-┌─────────────────────────────┐
+
+```text
+                         ┌─────────────────────────────┐
                         /      CUSTOMER LAYER          /|
                        /  Chat • Search • Cart       / |
                       /_____________________________/  |
@@ -159,7 +200,11 @@ The architecture is separated into five conceptual layers.
                       | Flask • Auth • Security     |
                       | REST APIs • Configuration  |
                       |_____________________________|
-Architecture relationship
+```
+
+### Architecture relationship
+
+```mermaid
 flowchart LR
 
     U["👤 Customer"] --> UI["Web UI / Chat"]
@@ -194,40 +239,90 @@ flowchart LR
     ANA --> DB
 
     DB --> AUD["Audit Logs"]
-🔄 End-to-End Agentic Commerce Flow
-Step 1 — Customer Intent
+```
+
+---
+
+# 🔄 End-to-End Agentic Commerce Flow
+
+## Step 1 — Customer Intent
+
 The customer communicates naturally.
+
 Example:
+
+```text
 "I need a laptop for programming under ₹60,000."
+```
+
 The AI commerce layer understands the request and searches the merchant's catalog.
-Step 2 — Product Discovery
+
+---
+
+## Step 2 — Product Discovery
+
 The search service can use:
-keyword matching
-category
-brand
-price range
-stock status
-product relevance
+
+- keyword matching
+- category
+- brand
+- price range
+- stock status
+- product relevance
+
 The result is returned from the merchant's own catalog.
-Step 3 — Recommendation
+
+---
+
+## Step 3 — Recommendation
+
 The recommendation engine identifies products that match the customer's requirements.
+
 The platform records recommendation events so the merchant can later understand recommendation-driven activity.
-Step 4 — Upsell and Cross-sell
+
+---
+
+## Step 4 — Upsell and Cross-sell
+
 The agent can suggest:
-Upsell
+
+### Upsell
+
 A higher-tier or premium alternative.
+
+```text
 "You could also consider the higher-performance model."
-Cross-sell
+```
+
+### Cross-sell
+
 A complementary product.
+
+```text
 "Would you like to add a wireless mouse or laptop bag?"
+```
+
 These actions are controlled by commerce permissions.
-Step 5 — Cart
+
+---
+
+## Step 5 — Cart
+
 The selected products are added to the customer's cart.
+
 The server calculates the cart total.
+
 The client should not be trusted to determine the final payable amount.
-Step 6 — Permission Gate
+
+---
+
+## Step 6 — Permission Gate
+
 Before financial actions, the permission engine checks the requested capability.
+
 Important capabilities include:
+
+```text
 product_read
 product_search
 product_compare
@@ -238,29 +333,58 @@ cart_create
 checkout_create
 payment_request
 refund_request
+```
+
 Financial capabilities are designed to be disabled by default and can have amount limits and approval requirements.
-Step 7 — Customer Confirmation
+
+---
+
+## Step 7 — Customer Confirmation
+
 Before proceeding to a payment action, the customer is given a clear confirmation step.
+
 This creates a human-readable boundary between:
+
+```text
 AI recommendation
+```
+
 and
+
+```text
 financial action
-Step 8 — Checkout and Payment
+```
+
+---
+
+## Step 8 — Checkout and Payment
+
 The payment service:
-resolves the cart amount
-checks the payment permission
-checks the configured limit
-creates a payment order
-stores the order in MongoDB
-creates a payment record
-writes an audit event
-returns checkout information
-Razorpay integration
+
+1. resolves the cart amount
+2. checks the payment permission
+3. checks the configured limit
+4. creates a payment order
+5. stores the order in MongoDB
+6. creates a payment record
+7. writes an audit event
+8. returns checkout information
+
+### Razorpay integration
+
 The project contains a Razorpay REST client.
+
 When Test Mode credentials are configured, real Razorpay API requests can be attempted.
+
 When the Razorpay secret is not configured, the project can run its deterministic demo/mock payment flow for development and demonstration.
-Do not describe the mock flow as a real Razorpay transaction.
-💳 Payment Security Flow
+
+**Do not describe the mock flow as a real Razorpay transaction.**
+
+---
+
+# 💳 Payment Security Flow
+
+```mermaid
 sequenceDiagram
     participant C as Customer
     participant UI as Web UI
@@ -286,8 +410,15 @@ sequenceDiagram
     P->>DB: Mark order paid
     P->>DB: Write audit event
     P-->>UI: Payment success
-🔁 Payment Failure and Retry
+```
+
+---
+
+# 🔁 Payment Failure and Retry
+
 The system also supports a controlled failure path.
+
+```text
 Payment Attempt
       ↓
    Failed
@@ -305,11 +436,21 @@ Can retry?
 New order   Stop
   ↓
 Retry Checkout
-The retry flow is capped at 3 attempts.
+```
+
+The retry flow is capped at **3 attempts**.
+
 The customer's cart/order context is preserved so a failed payment does not require rebuilding the entire shopping journey.
-🧾 Audit Trail
+
+---
+
+# 🧾 Audit Trail
+
 Important events are recorded for merchant visibility.
+
 Examples:
+
+```text
 product recommendation
 upsell
 cross-sell
@@ -324,22 +465,35 @@ payment retried
 payment refunded
 invalid payment signature
 workflow executed
+```
+
 The analytics service converts audit events into a visual timeline.
+
 This supports the principle:
-AI actions should be visible, bounded and auditable.
-📈 Revenue Analytics
+
+> **AI actions should be visible, bounded and auditable.**
+
+---
+
+# 📈 Revenue Analytics
+
 The Phase 5 analytics service computes metrics from live MongoDB data.
+
 Current dashboard metrics include:
-Total revenue
-Conversion rate
-Average order value
-Upsell revenue
-Cross-sell revenue
-Recommendation accuracy
-Workflow success rate
-Payment success rate
-Payment failure rate
-Analytics pipeline
+
+- Total revenue
+- Conversion rate
+- Average order value
+- Upsell revenue
+- Cross-sell revenue
+- Recommendation accuracy
+- Workflow success rate
+- Payment success rate
+- Payment failure rate
+
+### Analytics pipeline
+
+```mermaid
 flowchart TB
     A["Customer Sessions"] --> B["Recommendations"]
     B --> C["Cart Events"]
@@ -355,9 +509,17 @@ flowchart TB
     G --> J
     H --> J
     I --> J
-🧠 AI Architecture Engine
+```
+
+---
+
+# 🧠 AI Architecture Engine
+
 AI Commerce OS includes an architecture engine for workflow analysis.
+
 The current pipeline contains seven conceptual steps:
+
+```text
 1. Task Analysis
        ↓
 2. Structure Understanding
@@ -371,10 +533,19 @@ The current pipeline contains seven conceptual steps:
 6. Execution Planning
        ↓
 7. Memory Optimisation
+```
+
 The engine can inspect workflow topology, identify required capabilities, describe execution plans, and use known patterns from AI memory.
-🧩 Workflow Builder
+
+---
+
+# 🧩 Workflow Builder
+
 The platform includes a visual workflow system.
+
 Available concepts include:
+
+```text
 Start
 End
 AI Prompt
@@ -389,7 +560,11 @@ Human Approval
 Cart
 Checkout
 Delay
+```
+
 Example commerce workflow:
+
+```text
 START
   ↓
 Customer Request
@@ -411,7 +586,13 @@ Human Approval
 Checkout
   ↓
 END
-🗂️ Project Structure
+```
+
+---
+
+# 🗂️ Project Structure
+
+```text
 ai-commerce-os/
 │
 ├── app.py
@@ -499,56 +680,88 @@ ai-commerce-os/
 ├── docker-compose.yml
 ├── DEPLOY.md
 └── README.md
-🛠️ Technology Stack
-Layer
-Technology
-Backend
-Python + Flask
-Database
-MongoDB / MongoDB Atlas
-Database Driver
-PyMongo
-Authentication
-JWT
-Password Security
-bcrypt
-Encryption
-cryptography / Fernet
-AI Layer
-Provider adapter architecture
-Commerce
-Custom Python services
-Payments
-Razorpay REST API
-Frontend
-HTML, CSS, JavaScript
-Deployment
-Gunicorn / Docker
-Testing
-Python test modules
-⚙️ Installation
-Requirements
-Python 3.10+ recommended for the current development environment
-MongoDB local installation or MongoDB Atlas
-Internet connection for real Razorpay Test Mode API calls
-Optional AI provider credentials depending on the configured AI provider
-1. Clone the repository
+```
+
+---
+
+# 🛠️ Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Python + Flask |
+| Database | MongoDB / MongoDB Atlas |
+| Database Driver | PyMongo |
+| Authentication | JWT |
+| Password Security | bcrypt |
+| Encryption | cryptography / Fernet |
+| AI Layer | Provider adapter architecture |
+| Commerce | Custom Python services |
+| Payments | Razorpay REST API |
+| Frontend | HTML, CSS, JavaScript |
+| Deployment | Gunicorn / Docker |
+| Testing | Python test modules |
+
+---
+
+# ⚙️ Installation
+
+## Requirements
+
+- Python 3.10+ recommended for the current development environment
+- MongoDB local installation **or MongoDB Atlas**
+- Internet connection for real Razorpay Test Mode API calls
+- Optional AI provider credentials depending on the configured AI provider
+
+---
+
+## 1. Clone the repository
+
+```bash
 git clone YOUR_GITHUB_REPOSITORY_URL
 cd ai-commerce-os
-2. Create a virtual environment
-Windows
+```
+
+---
+
+## 2. Create a virtual environment
+
+### Windows
+
+```cmd
 python -m venv venv
 venv\Scripts\activate
-Linux / macOS
+```
+
+### Linux / macOS
+
+```bash
 python -m venv venv
 source venv/bin/activate
-3. Install dependencies
+```
+
+---
+
+## 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
-🔐 Environment Configuration
+```
+
+---
+
+# 🔐 Environment Configuration
+
 Create a file named:
+
+```text
 .env
-Do not commit this file to GitHub.
+```
+
+Do **not** commit this file to GitHub.
+
 Example:
+
+```env
 SECRET_KEY=your-long-random-secret
 
 MONGO_URI=mongodb+srv://USERNAME:PASSWORD@YOUR_CLUSTER.mongodb.net/?retryWrites=true&w=majority
@@ -568,40 +781,87 @@ AI_PROVIDER=mock
 FEATURE_AI_ENGINE_ENABLED=true
 FEATURE_PAYMENTS_ENABLED=true
 FEATURE_WORKFLOW_BUILDER_ENABLED=true
+```
+
 Use the exact MongoDB Atlas connection string generated by Atlas.
-Use only Razorpay Test Mode credentials during development.
-Never commit:
+
+Use only **Razorpay Test Mode** credentials during development.
+
+### Never commit:
+
+```text
 .env
 MongoDB passwords
 Razorpay secrets
 AI API keys
 JWT secrets
-The repository should contain .env.example, not the real .env.
-▶️ Run the Application
+```
+
+The repository should contain `.env.example`, not the real `.env`.
+
+---
+
+# ▶️ Run the Application
+
+```bash
 python app.py
+```
+
 The Flask server runs on:
+
+```text
 http://localhost:5000
+```
+
 Health endpoint:
+
+```text
 GET /api/health
+```
+
 Expected response:
+
+```json
 {
   "success": true,
   "status": "ok",
   "service": "ai-commerce-os",
   "phase": 5
 }
-🧪 Testing
+```
+
+---
+
+# 🧪 Testing
+
 The project contains phase-specific tests:
+
+```text
 test_phase2.py
 test_phase3.py
 test_phase4.py
 test_phase5.py
+```
+
 Run:
+
+```bash
 python -m pytest
+```
+
 or, depending on the local setup:
+
+```bash
 python test_phase5.py
-🎬 5-Minute Demo Flow
+```
+
+---
+
+# 🎬 5-Minute Demo Flow
+
 For a buildathon demonstration, use one continuous customer journey.
+
+```text
 00:00  Problem + product introduction
 00:30  Customer starts conversation
 01:00  AI understands requirement
@@ -613,9 +873,17 @@ For a buildathon demonstration, use one continuous customer journey.
 04:00  Payment result + audit trail
 04:30  Revenue analytics
 04:50  Final value proposition
-Suggested customer prompt
+```
+
+### Suggested customer prompt
+
+```text
 I need a laptop for programming under ₹60,000.
+```
+
 Then demonstrate:
+
+```text
 Recommendation
       ↓
 Upsell
@@ -635,24 +903,49 @@ Payment
 Audit
       ↓
 Analytics
-🏆 Why This Fits Track 01
+```
+
+---
+
+# 🏆 Why This Fits Track 01
+
 AI Commerce OS directly targets AI Growth & Agentic Commerce through:
-1. AI-powered product discovery
+
+### 1. AI-powered product discovery
+
 The agent understands customer requirements conversationally.
-2. Revenue growth
+
+### 2. Revenue growth
+
 Upselling and cross-selling create opportunities to increase order value.
-3. Agentic commerce
+
+### 3. Agentic commerce
+
 The agent can coordinate multiple steps from discovery toward checkout.
-4. Bounded financial actions
+
+### 4. Bounded financial actions
+
 Payment actions are protected by permissions, limits and approval logic.
-5. Explainability and auditability
+
+### 5. Explainability and auditability
+
 Important actions are recorded so merchants can inspect what happened.
-6. Failure handling
+
+### 6. Failure handling
+
 Payment failures are recorded and can enter a controlled retry flow.
-7. Measurable business impact
+
+### 7. Measurable business impact
+
 Revenue, conversion, AOV, upsell, cross-sell and payment metrics are surfaced to the merchant.
-🔒 Security Principles
+
+---
+
+# 🔒 Security Principles
+
 AI Commerce OS follows several important security principles:
+
+```text
 Deny by default
       ↓
 Least privilege
@@ -668,10 +961,19 @@ Server-side amount calculation
 Payment signature verification
       ↓
 Audit logging
+```
+
 The server calculates the final cart amount instead of trusting a client-provided amount.
+
 Razorpay payment signatures are verified before an order is marked as paid.
-🌐 API Modules
+
+---
+
+# 🌐 API Modules
+
 Major API areas include:
+
+```text
 /api/auth/*
 /api/merchant/*
 /api/products/*
@@ -688,10 +990,19 @@ Major API areas include:
 /api/payments/*
 /api/orders/*
 /api/analytics/*
+```
+
 The exact route set is implemented by the corresponding Flask blueprints in the repository.
-🗃️ MongoDB Data Model
+
+---
+
+# 🗃️ MongoDB Data Model
+
 The application uses merchant-scoped collections.
+
 Major collections include:
+
+```text
 users
 merchants
 sessions
@@ -719,19 +1030,43 @@ payments
 webhooks
 analytics
 merchant_usage
+```
+
 Merchant IDs are used throughout the data layer to keep commerce data separated between merchants.
-💡 Example Business Scenario
-Customer
+
+---
+
+# 💡 Example Business Scenario
+
+### Customer
+
+```text
 "I need a laptop for coding under ₹60,000."
-AI
+```
+
+### AI
+
+```text
 I found 3 matching laptops.
 The best match has 16GB RAM and a high-performance processor.
-Cross-sell
+```
+
+### Cross-sell
+
+```text
 Would you like to add a wireless mouse?
-Cart
+```
+
+### Cart
+
+```text
 Laptop + Mouse
 Total: ₹XX,XXX
-Control
+```
+
+### Control
+
+```text
 Payment capability
       ↓
 Permission check
@@ -739,13 +1074,21 @@ Permission check
 Amount limit
       ↓
 Customer confirmation
-Transaction
+```
+
+### Transaction
+
+```text
 Checkout
    ↓
 Razorpay Test Mode / Demo Mode
    ↓
 Payment verification
-Merchant
+```
+
+### Merchant
+
+```text
 Revenue
 Conversion
 AOV
@@ -753,27 +1096,47 @@ Upsell
 Cross-sell
 Payment success/failure
 Audit timeline
-⚠️ Demo Payment Note
+```
+
+---
+
+# ⚠️ Demo Payment Note
+
 When Razorpay Test Mode credentials are configured, the payment client is designed to make real Test Mode API requests.
+
 When the Razorpay secret is absent, the application has a demo/mock path so the rest of the payment lifecycle can be exercised during development.
+
 Therefore:
-Demo/mock payment ≠ real Razorpay transaction.
+
+> **Demo/mock payment ≠ real Razorpay transaction.**
+
 For a final buildathon demonstration, configure Razorpay Test Mode credentials if you want to demonstrate an actual Razorpay Test Mode checkout.
-🚀 Future Roadmap
+
+---
+
+# 🚀 Future Roadmap
+
 Potential future improvements include:
-deeper LLM-based intent understanding
-richer personalized recommendations
-MongoDB aggregation pipelines for analytics
-advanced merchant growth optimization
-campaign orchestration
-better AI memory
-automated experiment generation
-deeper Razorpay webhook reconciliation
-production observability
-stronger fraud/risk controls
-multi-agent commerce workflows
-👨‍💻 Project Vision
+
+- deeper LLM-based intent understanding
+- richer personalized recommendations
+- MongoDB aggregation pipelines for analytics
+- advanced merchant growth optimization
+- campaign orchestration
+- better AI memory
+- automated experiment generation
+- deeper Razorpay webhook reconciliation
+- production observability
+- stronger fraud/risk controls
+- multi-agent commerce workflows
+
+---
+
+# 👨‍💻 Project Vision
+
 AI Commerce OS is built around a simple principle:
+
+```text
 AI should not just talk.
 
 AI should understand.
@@ -783,6 +1146,12 @@ AI should stay within boundaries.
 AI should explain what it did.
 AI should leave an audit trail.
 And AI should create measurable business value.
-⭐ Final Positioning
-AI Commerce OS — an agentic commerce platform that turns customer conversations into bounded, explainable and auditable transactions while helping merchants grow revenue.
-Built for the Razorpay AI Buildathon 2026 — Track 01: AI Growth
+```
+
+---
+
+## ⭐ Final Positioning
+
+> **AI Commerce OS — an agentic commerce platform that turns customer conversations into bounded, explainable and auditable transactions while helping merchants grow revenue.**
+
+**Built for the Razorpay AI Buildathon 2026 — Track 01: AI Growth & Agentic Commerce.**
