@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'analytics' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Analytics</div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+
+      <!-- 8 metric cards -->
+      <div class="metrics-grid" id="metrics-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="card metric-card"><div class="metric-card-label">Total Revenue</div><div class="metric-card-value is-empty" id="m-revenue">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Conversion Rate</div><div class="metric-card-value is-empty" id="m-conversion">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Avg Order Value</div><div class="metric-card-value is-empty" id="m-aov">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Upsell Revenue</div><div class="metric-card-value is-empty" id="m-upsell">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Cross-sell Revenue</div><div class="metric-card-value is-empty" id="m-crosssell">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Rec Accuracy</div><div class="metric-card-value is-empty" id="m-recacc">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Workflow Success</div><div class="metric-card-value is-empty" id="m-wf">—</div></div>
+        <div class="card metric-card"><div class="metric-card-label">Payment Success</div><div class="metric-card-value is-empty" id="m-pay">—</div></div>
+      </div>
+
+      <!-- Audit timeline -->
+      <div class="card section-card" style="margin-top:var(--space-5)">
+        <div class="section-card-header"><h3>Audit Timeline</h3></div>
+        <div id="timeline-list"><div class="empty-state"><p>Loading…</p></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(async profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile); ACOS.wireLogout(); ACOS.wireMobileSidebar();
+
+    // Load metrics
+    try {
+      const res = await ACOS.apiFetch('/api/analytics');
+      const d   = res.data;
+      const fmt = (v, unit) => {
+        if (v == null) return '—';
+        if (unit === 'INR') return '₹' + (+v).toLocaleString('en-IN');
+        if (unit === 'percent') return (+v).toFixed(1) + '%';
+        return v;
+      };
+      const set = (id, val, unit) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const formatted = fmt(val, unit);
+        el.textContent = formatted;
+        el.classList.toggle('is-empty', val == null || val === 0);
+      };
+      set('m-revenue',   d.revenue?.value,                 'INR');
+      set('m-conversion',d.conversion_rate?.value,          'percent');
+      set('m-aov',       d.average_order_value?.value,      'INR');
+      set('m-upsell',    d.upsell_revenue?.value,           'INR');
+      set('m-crosssell', d.cross_sell_revenue?.value,       'INR');
+      set('m-recacc',    d.recommendation_accuracy?.value,  'percent');
+      set('m-wf',        d.workflow_success_rate?.value,    'percent');
+      set('m-pay',       d.payment_success_rate?.value,     'percent');
+    } catch (err) {
+      document.getElementById('page-error').textContent = err.message;
+      document.getElementById('page-error').hidden = false;
+    }
+
+    // Load timeline
+    try {
+      const res = await ACOS.apiFetch('/api/analytics/timeline');
+      const events = res.data.timeline;
+      const list   = document.getElementById('timeline-list');
+      if (!events.length) {
+        list.innerHTML = '<div class="empty-state"><h4>No activity yet</h4><p>Actions across payments, workflows, and AI will appear here.</p></div>';
+        return;
+      }
+      list.innerHTML = events.map(e => `
+        <div class="activity-row">
+          <span style="font-size:18px">${e.icon}</span>
+          <div style="flex:1">
+            <span class="activity-action">${esc(e.label)}</span>
+            ${e.details && Object.keys(e.details).length ? ` <span class="activity-time" style="margin-left:8px">${esc(JSON.stringify(e.details).slice(0,80))}</span>` : ''}
+          </div>
+          <span class="badge badge-neutral" style="font-size:10px">${e.tag}</span>
+          <span class="activity-time">${ACOS.formatRelativeTime(e.timestamp)}</span>
+        </div>`).join('');
+    } catch (e) { /* non-fatal */ }
+  });
+});
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

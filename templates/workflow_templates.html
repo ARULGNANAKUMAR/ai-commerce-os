@@ -1,0 +1,99 @@
+<!-- workflow_templates.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Templates — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'templates' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Agent Templates</div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-success" id="page-success" hidden></div>
+      <div class="banner banner-error"   id="page-error"   hidden></div>
+      <p class="text-muted" style="margin-bottom:var(--space-5)">Start with a pre-built agent — customise it in the builder in seconds.</p>
+      <div id="tmpl-grid" class="wf-card-grid">
+        <div class="empty-state">
+          <div class="spinner" style="border-color:var(--color-border);border-top-color:var(--color-primary);width:32px;height:32px;margin:0 auto"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(async profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile);
+    ACOS.wireLogout(); ACOS.wireMobileSidebar();
+
+    const CAT_COLORS = { sales:'badge-success', information:'badge-neutral', advanced:'badge-warning', default:'badge-neutral' };
+    const CAT_ICONS  = { sales:'📈', information:'ℹ️', advanced:'⚡', default:'🔗' };
+
+    try {
+      const res = await ACOS.apiFetch('/api/templates');
+      const tmpls = res.data.templates;
+      const grid  = document.getElementById('tmpl-grid');
+
+      if (!tmpls.length) {
+        grid.innerHTML = '<div class="empty-state"><h4>No templates found</h4></div>';
+        return;
+      }
+
+      grid.innerHTML = tmpls.map(t => `
+        <div class="wf-card">
+          <div class="wf-card-header">
+            <span style="font-size:28px">${CAT_ICONS[t.category] || CAT_ICONS.default}</span>
+            <span class="badge ${CAT_COLORS[t.category] || CAT_COLORS.default}" style="margin-left:auto">${t.category}</span>
+          </div>
+          <div class="wf-card-name">${esc(t.name)}</div>
+          <div class="wf-card-meta">${esc(t.description)}</div>
+          <div class="wf-card-stats">
+            <span class="wf-stat">🔗 ${t.node_count} nodes</span>
+            ${(t.tags||[]).map(tag=>`<span class="badge badge-neutral" style="font-size:10px">${esc(tag)}</span>`).join('')}
+          </div>
+          <div class="wf-card-actions">
+            <button class="btn btn-primary btn-sm btn-block tmpl-use-btn" data-slug="${t.slug}" data-name="${esc(t.name)}">Use this template →</button>
+          </div>
+        </div>`).join('');
+
+      grid.querySelectorAll('.tmpl-use-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const slug = btn.dataset.slug;
+          const name = btn.dataset.name;
+          btn.disabled = true; btn.textContent = 'Creating…';
+          try {
+            const r = await ACOS.apiFetch(`/api/templates/${slug}/use`, { method:'POST', body:{ name } });
+            const wid = r.data.workflow.id;
+            window.location.href = `/builder/${wid}`;
+          } catch(err) {
+            document.getElementById('page-error').textContent = err.message || 'Failed to use template.';
+            document.getElementById('page-error').hidden = false;
+            btn.disabled = false; btn.textContent = 'Use this template →';
+          }
+        });
+      });
+    } catch(err) {
+      document.getElementById('page-error').textContent = err.message || 'Failed to load templates.';
+      document.getElementById('page-error').hidden = false;
+    }
+  });
+});
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

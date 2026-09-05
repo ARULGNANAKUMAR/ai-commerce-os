@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Copilot — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'copilot' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Merchant Copilot</div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="copilot-chat">
+        <p class="text-muted" style="margin-bottom:var(--space-3)">Ask about your catalog performance. Answers are grounded in real cart activity — not guesses.</p>
+        <div>
+          <span class="copilot-suggestion-chip" data-q="Which products sell better?">Which products sell better?</span>
+          <span class="copilot-suggestion-chip" data-q="Which products need a campaign?">Which need a campaign?</span>
+          <span class="copilot-suggestion-chip" data-q="Suggest a bundle to increase revenue">Suggest a bundle</span>
+        </div>
+        <form id="copilot-form" style="display:flex;gap:8px;margin-top:var(--space-4)">
+          <input type="text" id="copilot-input" placeholder="Ask a question…" style="flex:1;padding:11px 16px;border:1px solid var(--color-border);border-radius:999px;font-family:inherit;font-size:13.5px">
+          <button type="submit" class="btn btn-primary">Ask</button>
+        </form>
+        <div id="copilot-results"></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile); ACOS.wireLogout(); ACOS.wireMobileSidebar();
+    document.getElementById('copilot-form').addEventListener('submit', onAsk);
+    document.querySelectorAll('.copilot-suggestion-chip').forEach(chip =>
+      chip.addEventListener('click', () => ask(chip.dataset.q)));
+  });
+});
+
+function onAsk(e) {
+  e.preventDefault();
+  const input = document.getElementById('copilot-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  ask(q);
+}
+
+async function ask(question) {
+  const results = document.getElementById('copilot-results');
+  const card = document.createElement('div');
+  card.className = 'copilot-answer-card';
+  card.innerHTML = `<div style="font-weight:600;font-size:13px;color:var(--color-navy);margin-bottom:6px">${esc(question)}</div><div style="font-size:13px;color:var(--color-text-faint)">Thinking…</div>`;
+  results.prepend(card);
+
+  try {
+    const res = await ACOS.apiFetch('/api/copilot/ask', { method:'POST', body: { question } });
+    const d = res.data;
+    let dataHtml = '';
+    if (d.data && d.data.length) {
+      dataHtml = d.data.slice(0,5).map(item => {
+        if (item.product) return `<div class="copilot-insight-item">📦 ${esc(item.product.name)} ${item.cart_adds !== undefined ? `— ${item.cart_adds} cart adds` : ''}</div>`;
+        if (item.products) return `<div class="copilot-insight-item">🔗 ${item.products.map(p=>esc(p.name)).join(' + ')} — ${item.co_occurrences} times together</div>`;
+        return '';
+      }).join('');
+    }
+    card.innerHTML = `
+      <div style="font-weight:600;font-size:13px;color:var(--color-navy);margin-bottom:6px">${esc(question)}</div>
+      <div style="font-size:13.5px;color:var(--color-text);margin-bottom:8px">${esc(d.answer)}</div>
+      ${dataHtml}
+    `;
+  } catch (err) {
+    card.innerHTML = `<div style="font-weight:600;font-size:13px;margin-bottom:6px">${esc(question)}</div><div style="color:var(--color-danger);font-size:13px">${esc(err.message)}</div>`;
+  }
+}
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

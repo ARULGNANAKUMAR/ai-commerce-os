@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'products' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Products</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" id="import-btn">Import CSV / JSON</button>
+        <button class="btn btn-primary btn-sm" id="add-product-btn">+ Add product</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+      <div class="banner banner-success" id="page-success" hidden></div>
+
+      <!-- Search + filter bar -->
+      <div class="card" style="padding:var(--space-4);margin-bottom:var(--space-4);">
+        <div class="filter-bar">
+          <input type="search" id="search-input" placeholder="Search by name, category, brand…" class="filter-search">
+          <select id="filter-availability" class="filter-select">
+            <option value="">All availability</option>
+            <option value="in_stock">In stock</option>
+            <option value="out_of_stock">Out of stock</option>
+            <option value="pre_order">Pre-order</option>
+          </select>
+          <select id="filter-category" class="filter-select">
+            <option value="">All categories</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" id="clear-filters-btn">Clear</button>
+        </div>
+      </div>
+
+      <!-- Product table -->
+      <div class="card">
+        <div class="product-table-wrap">
+          <table class="product-table" id="product-table">
+            <thead>
+              <tr>
+                <th>Product</th><th>SKU</th><th>Price</th><th>Stock</th>
+                <th>Availability</th><th>Status</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="product-tbody">
+              <tr><td colspan="7" class="table-loading">Loading products…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-pagination" id="table-pagination" hidden>
+          <span id="pagination-info"></span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" id="prev-btn">← Prev</button>
+            <button class="btn btn-secondary btn-sm" id="next-btn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-backdrop" id="product-modal-backdrop" hidden>
+  <div class="modal-card" id="product-modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Add product</h3>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <form id="product-form" novalidate>
+      <input type="hidden" id="editing-product-id">
+      <div class="modal-body">
+        <div class="field-row">
+          <div class="field" style="flex:2">
+            <label for="p-name">Name *</label>
+            <input type="text" id="p-name" placeholder="Blue Silk Kurta" required>
+          </div>
+          <div class="field">
+            <label for="p-sku">SKU</label>
+            <input type="text" id="p-sku" placeholder="KRT-001">
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-description">Description</label>
+          <textarea id="p-description" rows="2" placeholder="Product description…" style="width:100%;padding:11px 14px;border:1px solid var(--color-border);border-radius:8px;font-family:inherit;font-size:14px;resize:vertical"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-category">Category</label>
+            <input type="text" id="p-category" placeholder="Fashion">
+          </div>
+          <div class="field">
+            <label for="p-brand">Brand</label>
+            <input type="text" id="p-brand" placeholder="Brand name">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-price">Price (₹) *</label>
+            <input type="number" id="p-price" min="0" step="0.01" placeholder="999">
+          </div>
+          <div class="field">
+            <label for="p-discount">Discount %</label>
+            <input type="number" id="p-discount" min="0" max="100" step="0.1" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="p-stock">Stock</label>
+            <input type="number" id="p-stock" min="0" step="1" placeholder="50">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="p-availability">Availability</label>
+            <select id="p-availability">
+              <option value="in_stock">In stock</option>
+              <option value="out_of_stock">Out of stock</option>
+              <option value="pre_order">Pre-order</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="p-status">Status</label>
+            <select id="p-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="p-tags">Tags (comma-separated)</label>
+          <input type="text" id="p-tags" placeholder="kurta, cotton, summer">
+        </div>
+        <div class="banner banner-error" id="modal-error" hidden></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="modal-save-btn">Save product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-backdrop" id="import-modal-backdrop" hidden>
+  <div class="modal-card" style="max-width:480px">
+    <div class="modal-header">
+      <h3>Import products</h3>
+      <button class="modal-close" id="import-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted" style="margin-bottom:var(--space-4)">Upload a CSV or JSON file. Maximum 500 rows, 5 MB.</p>
+      <div class="import-drop-zone" id="import-drop-zone">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--color-text-faint);margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Drop CSV or JSON file here, or <label for="import-file-input" style="color:var(--color-primary);cursor:pointer;text-decoration:underline">browse</label></span>
+        <input type="file" id="import-file-input" accept=".csv,.json" style="display:none">
+        <span id="import-file-name" style="font-size:13px;color:var(--color-text-muted);margin-top:4px"></span>
+      </div>
+      <div class="banner banner-error"   id="import-error"   hidden></div>
+      <div class="banner banner-success" id="import-success" hidden></div>
+      <div class="import-result" id="import-result" hidden></div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" id="import-cancel-btn">Close</button>
+      <button type="button" class="btn btn-primary"   id="import-submit-btn" disabled>Upload &amp; Import</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='products.js') }}"></script>
+</body>
+</html>

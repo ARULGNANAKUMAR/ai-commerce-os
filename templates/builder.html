@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Builder — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='builder.css') }}">
+</head>
+<body style="overflow:hidden">
+<div class="builder-shell">
+
+  <!-- Toolbar -->
+  <div class="builder-toolbar">
+    <a href="/workflows" class="builder-toolbar-logo">
+      <svg width="20" height="20" viewBox="0 0 28 28" fill="none"><rect x="1" y="1" width="16" height="16" rx="5" fill="#3395FF"/><rect x="11" y="11" width="16" height="16" rx="5" fill="#6FB8FF" fill-opacity="0.85"/></svg>
+      My Agents
+    </a>
+    <div class="toolbar-sep"></div>
+    <input type="text" id="wf-name" class="builder-wf-name" value="Untitled Workflow" autocomplete="off">
+    <span class="toolbar-status badge badge-neutral" id="toolbar-status">Draft</span>
+    <div class="toolbar-right">
+      <button class="btn btn-secondary btn-sm" id="analyze-btn">⚡ Analyze</button>
+      <button class="btn btn-secondary btn-sm" id="save-btn">Save</button>
+      <button class="btn btn-secondary btn-sm" id="publish-btn">Publish</button>
+      <button class="btn btn-primary btn-sm" id="run-btn">▶ Test Run</button>
+    </div>
+  </div>
+
+  <div class="builder-body">
+
+    <!-- Node palette -->
+    <div class="node-palette" id="node-palette">
+      <div class="palette-section">
+        <div class="palette-section-label">Trigger</div>
+        <div class="palette-node" data-type="trigger.start">
+          <div class="palette-node-icon" style="background:#DCFCE7">▶</div>Start
+        </div>
+        <div class="palette-node" data-type="trigger.end">
+          <div class="palette-node-icon" style="background:#DCFCE7">⏹</div>End
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">AI</div>
+        <div class="palette-node" data-type="ai.prompt">
+          <div class="palette-node-icon" style="background:#EDE9FE">✨</div>AI Prompt
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">Catalog</div>
+        <div class="palette-node" data-type="catalog.product_search">
+          <div class="palette-node-icon" style="background:#EAF3FF">🔍</div>Product Search
+        </div>
+        <div class="palette-node" data-type="catalog.product_compare">
+          <div class="palette-node-icon" style="background:#EAF3FF">⚖️</div>Compare
+        </div>
+        <div class="palette-node" data-type="catalog.recommendation">
+          <div class="palette-node-icon" style="background:#EAF3FF">⭐</div>Recommendation
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">Sales</div>
+        <div class="palette-node" data-type="sales.upsell">
+          <div class="palette-node-icon" style="background:#FEF3E2">📈</div>Upsell
+        </div>
+        <div class="palette-node" data-type="sales.cross_sell">
+          <div class="palette-node-icon" style="background:#FEF3E2">🔀</div>Cross-sell
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">Logic</div>
+        <div class="palette-node" data-type="logic.condition">
+          <div class="palette-node-icon" style="background:#FEF9C3">⚡</div>Condition
+        </div>
+        <div class="palette-node" data-type="permission.check">
+          <div class="palette-node-icon" style="background:#FDEEEC">🛡</div>Permission Check
+        </div>
+        <div class="palette-node" data-type="human.approval">
+          <div class="palette-node-icon" style="background:#FDEBD5">👤</div>Human Approval
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">Commerce</div>
+        <div class="palette-node" data-type="commerce.cart">
+          <div class="palette-node-icon" style="background:#CFFAFE">🛒</div>Cart
+        </div>
+        <div class="palette-node" data-type="commerce.checkout_placeholder">
+          <div class="palette-node-icon" style="background:#CFFAFE">💳</div>Checkout
+        </div>
+      </div>
+      <div class="palette-section">
+        <div class="palette-section-label">Utility</div>
+        <div class="palette-node" data-type="utility.delay">
+          <div class="palette-node-icon" style="background:#F0F3F8">⏱</div>Delay
+        </div>
+      </div>
+      <div style="padding:var(--space-3) var(--space-2);font-size:11px;color:var(--color-text-faint)">
+        Click or drag nodes onto the canvas
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrapper" id="canvas-wrapper">
+      <div class="canvas-root" id="canvas-root">
+        <svg class="edges-svg" id="edges-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L0,7 L7,3.5 z" fill="#94A3B8"/>
+            </marker>
+            <marker id="arrow-blue" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <path d="M0,0 L0,7 L7,3.5 z" fill="#3395FF"/>
+            </marker>
+          </defs>
+          <path id="edge-preview" class="wf-edge-preview" d=""/>
+        </svg>
+        <div class="nodes-layer" id="nodes-layer"></div>
+      </div>
+      <div class="canvas-controls">
+        <button class="canvas-ctrl-btn" id="zoom-in-btn" title="Zoom in">+</button>
+        <button class="canvas-ctrl-btn" id="zoom-out-btn" title="Zoom out">−</button>
+        <button class="canvas-ctrl-btn" id="fit-btn" title="Fit to screen">⊡</button>
+        <button class="canvas-ctrl-btn" id="clear-btn" title="Clear canvas">🗑</button>
+      </div>
+      <div class="canvas-zoom-label" id="zoom-label">100%</div>
+      <div id="canvas-hint" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;color:var(--color-text-faint)">
+        <div style="font-size:32px;margin-bottom:8px">🔗</div>
+        <div style="font-size:14px;font-weight:600;color:var(--color-text-muted)">Click a node from the palette to add it</div>
+        <div style="font-size:12px;margin-top:4px">or use a template to start with a pre-built agent</div>
+        <a href="/templates" style="font-size:12px;margin-top:8px;display:inline-block">Browse templates →</a>
+      </div>
+    </div>
+
+    <!-- Config panel -->
+    <div class="config-panel" id="config-panel">
+      <div class="config-panel-empty" id="config-empty">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.14.31.22.65.22 1H21a2 2 0 010 4h-.09c-.14.31-.22.65-.22 1z"/></svg>
+        <p>Select a node to configure it</p>
+      </div>
+      <div id="config-content" hidden>
+        <div class="config-panel-header">
+          <h4 id="config-node-label">Node</h4>
+          <div class="config-panel-type" id="config-node-type"></div>
+        </div>
+        <div class="config-panel-body" id="config-body"></div>
+        <div class="config-panel-footer">
+          <button class="btn btn-primary btn-sm btn-block" id="config-save-btn">Apply changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- builder-body -->
+</div><!-- builder-shell -->
+
+<!-- Test Run Modal -->
+<div class="exec-modal-overlay" id="exec-modal" hidden>
+  <div class="exec-modal">
+    <div class="exec-modal-header">
+      <h3>Test Run</h3>
+      <button class="modal-close" id="exec-close-btn">✕</button>
+    </div>
+    <div class="exec-modal-body" id="exec-modal-body">
+      <p class="text-muted" style="font-size:13px;margin-bottom:var(--space-4)">Provide sample trigger data and run the workflow. AI nodes use mock responses if no provider is connected.</p>
+      <div class="config-field">
+        <label>Customer query</label>
+        <input type="text" id="td-query" value="show me blue kurtas under 2000" placeholder="Customer search query">
+      </div>
+      <div style="display:flex;gap:var(--space-3)">
+        <div class="config-field" style="flex:1">
+          <label>Budget (₹)</label>
+          <input type="number" id="td-budget" value="2000" min="0">
+        </div>
+        <div class="config-field" style="flex:1">
+          <label>Category</label>
+          <input type="text" id="td-category" value="Fashion" placeholder="Fashion">
+        </div>
+      </div>
+      <div class="config-field">
+        <label>Customer name</label>
+        <input type="text" id="td-name" value="Priya" placeholder="Customer name">
+      </div>
+      <div id="exec-results" hidden>
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3)">
+          <strong style="font-size:13.5px">Execution results</strong>
+          <span class="badge" id="exec-status-badge">Completed</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--color-text-faint)" id="exec-duration"></span>
+        </div>
+        <div id="exec-steps-list"></div>
+        <div class="exec-result-box" id="exec-result-box" hidden>
+          <div style="font-size:12px;font-weight:600;color:var(--color-navy);margin-bottom:6px">Final result</div>
+          <pre id="exec-result-pre"></pre>
+        </div>
+      </div>
+    </div>
+    <div class="exec-modal-footer">
+      <button class="btn btn-secondary btn-sm" id="exec-cancel-btn">Close</button>
+      <button class="btn btn-primary btn-sm" id="exec-run-btn">▶ Run workflow</button>
+    </div>
+  </div>
+</div>
+
+<!-- Analysis Modal -->
+<div class="exec-modal-overlay" id="analyze-modal" hidden>
+  <div class="exec-modal" style="max-width:560px">
+    <div class="exec-modal-header">
+      <h3>⚡ AI Architecture Analysis</h3>
+      <button class="modal-close" id="analyze-close-btn">✕</button>
+    </div>
+    <div class="exec-modal-body" id="analyze-modal-body">
+      <div style="text-align:center;padding:var(--space-6);color:var(--color-text-faint)">Analysing workflow…</div>
+    </div>
+    <div class="exec-modal-footer">
+      <button class="btn btn-secondary btn-sm" id="analyze-ok-btn">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='builder.js') }}"></script>
+</body>
+</html>

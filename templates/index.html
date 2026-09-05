@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Commerce OS — Build an AI shopping agent, visually</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .landing-hero {
+      min-height: 100vh;
+      background: linear-gradient(155deg, var(--color-navy) 0%, var(--color-navy-soft) 55%, #1B3E6E 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .landing-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-5) var(--space-7);
+    }
+    .landing-nav-actions { display: flex; gap: var(--space-3); }
+    .landing-nav .btn-secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,0.25); }
+    .landing-nav .btn-secondary:hover { border-color: #fff; color: #fff; }
+    .landing-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-7);
+    }
+    .landing-copy { max-width: 620px; }
+    .landing-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12.5px; font-weight: 600; letter-spacing: 0.03em;
+      color: #9FC7FF; background: rgba(51,149,255,0.14);
+      padding: 6px 12px; border-radius: 999px; margin-bottom: var(--space-5);
+    }
+    .landing-copy h1 { color: #fff; font-size: 44px; line-height: 1.12; margin-bottom: var(--space-4); }
+    .landing-copy p.lead { color: rgba(255,255,255,0.7); font-size: 17px; max-width: 520px; margin-bottom: var(--space-6); }
+    .landing-actions { display: flex; gap: var(--space-3); margin-bottom: var(--space-7); }
+    .landing-actions .btn { padding: 13px 24px; font-size: 15px; }
+    .landing-actions .btn-secondary { background: transparent; color: #fff; border-color: rgba(255,255,255,0.25); }
+    .landing-foot-note { color: rgba(255,255,255,0.4); font-size: 12.5px; }
+  </style>
+</head>
+<body>
+  <div class="landing-hero">
+    <nav class="landing-nav">
+      <div class="auth-logo">
+        <svg class="auth-logo-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="16" height="16" rx="5" fill="#3395FF"/>
+          <rect x="11" y="11" width="16" height="16" rx="5" fill="#6FB8FF" fill-opacity="0.85"/>
+        </svg>
+        AI Commerce OS
+      </div>
+      <div class="landing-nav-actions">
+        <a class="btn btn-secondary" href="/login">Log in</a>
+        <a class="btn btn-primary" href="/signup">Sign up free</a>
+      </div>
+    </nav>
+    <main class="landing-main">
+      <div class="landing-copy">
+        <span class="landing-eyebrow">● Razorpay AI Buildathon 2026 — Track 01</span>
+        <h1>Build an AI shopping agent for your store — no AI team required.</h1>
+        <p class="lead">Connect your own AI key, upload your product catalog, and compose a permissioned shopping agent on a visual canvas. Publish it to your site in minutes.</p>
+        <div class="landing-actions">
+          <a class="btn btn-primary" href="/signup">Create your account</a>
+          <a class="btn btn-secondary" href="/login">I already have an account</a>
+        </div>
+        <p class="landing-foot-note">Phase 1 foundation — authentication, merchant profile &amp; dashboard shell. Agent builder ships in Phase 2.</p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

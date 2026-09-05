@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Products — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'compare' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Compare Products</div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+      <div class="card" style="padding:var(--space-4);margin-bottom:var(--space-4)">
+        <p class="text-muted" style="margin-bottom:var(--space-3);font-size:13px">Pick 2–6 products to compare side-by-side.</p>
+        <div class="compare-picker" id="product-picker"></div>
+        <button class="btn btn-primary btn-sm" id="compare-btn" disabled>Compare selected (<span id="selected-count">0</span>)</button>
+      </div>
+      <div class="card section-card" id="result-card" hidden>
+        <div class="section-card-header"><h3>Comparison result</h3></div>
+        <div id="summary-list" style="margin-bottom:var(--space-4)"></div>
+        <div class="compare-table-wrap">
+          <table class="compare-table" id="compare-table"></table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='compare.js') }}"></script>
+</body>
+</html>

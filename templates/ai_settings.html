@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Provider — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'ai_settings' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">AI Provider</div>
+      </div>
+    </header>
+
+    <main class="content" style="max-width:720px">
+      <div class="banner banner-error"   id="page-error"   hidden></div>
+      <div class="banner banner-success" id="page-success" hidden></div>
+
+      <!-- Status card -->
+      <div class="card ai-status-card" id="status-card">
+        <div class="ai-status-icon" id="status-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="3"/><circle cx="5" cy="18" r="3"/><circle cx="19" cy="18" r="3"/><path d="M12 9v4M12 13l-5.5 3M12 13l5.5 3"/></svg>
+        </div>
+        <div>
+          <div class="ai-status-label" id="status-label">No AI provider connected</div>
+          <div class="ai-status-sub" id="status-sub">Connect a provider to enable the AI agent in Phase 3.</div>
+        </div>
+        <span class="badge badge-neutral" id="status-badge">Not connected</span>
+      </div>
+
+      <!-- Configuration form -->
+      <div class="card settings-panel" style="margin-top:var(--space-4)">
+        <h3>Provider configuration</h3>
+        <p class="panel-desc text-muted">Your API key is encrypted with AES-256 and never exposed to the browser or logs. Only the last 4 characters are shown for reference.</p>
+
+        <form id="ai-form" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="ai-provider">AI provider</label>
+              <select id="ai-provider">
+                <option value="">Select provider…</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ai-model">Model</label>
+              <select id="ai-model" disabled>
+                <option value="">Select provider first</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field" id="key-field">
+            <label for="ai-key">API key</label>
+            <div class="key-input-wrap">
+              <input type="password" id="ai-key" autocomplete="off" placeholder="Enter your API key">
+              <button type="button" class="key-toggle-btn" id="key-toggle-btn" title="Show/hide">
+                <svg id="key-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="field-hint" id="key-hint-display" hidden>Currently using key ending in <code id="key-hint-code">••••</code>. Leave blank to keep existing key.</div>
+          </div>
+
+          <div class="banner banner-warning" id="key-warning" hidden>
+            Never paste API keys into browser address bars, chat apps, or emails. Only enter them in this secure form.
+          </div>
+
+          <div class="settings-form-actions">
+            <button type="submit" class="btn btn-primary" id="save-btn">Save provider</button>
+            <button type="button" class="btn btn-secondary" id="test-btn" disabled>Test connection</button>
+            <button type="button" class="btn btn-danger-ghost btn-sm" id="remove-btn" hidden>Disconnect</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Test result panel -->
+      <div class="card settings-panel" id="test-result-card" hidden style="margin-top:var(--space-4)">
+        <h3>Connection test result</h3>
+        <div id="test-result-body"></div>
+      </div>
+
+      <!-- BYOK explainer -->
+      <div class="card settings-panel" style="margin-top:var(--space-4);background:var(--color-surface-sunken)">
+        <h3 style="font-size:14px">How Bring Your Own Key works</h3>
+        <ul style="padding-left:20px;margin:var(--space-3) 0 0;font-size:13.5px;color:var(--color-text-muted);line-height:1.8">
+          <li>Your API key is encrypted with AES-256 (Fernet) before being stored in MongoDB.</li>
+          <li>The raw key is decrypted in-memory only when an AI request is made — never persisted or logged.</li>
+          <li>AI costs are charged directly to your provider account. AI Commerce OS does not mark up or resell AI.</li>
+          <li>You can rotate your key at any time by entering a new one and clicking "Save provider".</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='ai_settings.js') }}"></script>
+</body>
+</html>

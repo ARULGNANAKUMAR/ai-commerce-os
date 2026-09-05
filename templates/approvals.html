@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Approvals — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'approvals' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Checkout Approvals</div>
+      </div>
+    </header>
+    <main class="content" style="max-width:640px">
+      <div class="banner banner-error" id="page-error" hidden></div>
+      <p class="text-muted" style="margin-bottom:var(--space-4)">AI-initiated checkouts that need your review before they can proceed, based on your payment permission settings.</p>
+      <div id="approvals-list">
+        <div class="empty-state"><div class="spinner" style="border-color:var(--color-border);border-top-color:var(--color-primary);width:28px;height:28px;margin:0 auto"></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(async profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile); ACOS.wireLogout(); ACOS.wireMobileSidebar();
+    await load();
+  });
+});
+
+async function load() {
+  try {
+    const res = await ACOS.apiFetch('/api/approval');
+    render(res.data.approvals);
+  } catch (err) {
+    document.getElementById('page-error').textContent = err.message;
+    document.getElementById('page-error').hidden = false;
+  }
+}
+
+function render(approvals) {
+  const el = document.getElementById('approvals-list');
+  if (!approvals.length) {
+    el.innerHTML = '<div class="empty-state"><h4>No checkout requests yet</h4><p>They will appear here once a shopper tries to check out through the AI chat.</p></div>';
+    return;
+  }
+  const statusBadge = { pending:'badge-warning', approved:'badge-success', rejected:'badge-danger' };
+  el.innerHTML = approvals.map(a => `
+    <div class="approval-card">
+      <div class="approval-card-header">
+        <span class="approval-amount">₹${a.amount.toLocaleString('en-IN')}</span>
+        <span class="badge ${statusBadge[a.status]||'badge-neutral'}">${a.status}</span>
+      </div>
+      <div class="approval-reason">${esc(a.reason||'')} · ${ACOS.formatRelativeTime(a.created_at)}</div>
+      ${a.status === 'pending' ? `
+        <div class="approval-actions">
+          <button class="btn btn-primary btn-sm" data-action="approved" data-id="${a.approval_id}">Approve</button>
+          <button class="btn btn-danger-ghost btn-sm" data-action="rejected" data-id="${a.approval_id}">Reject</button>
+        </div>` : ''}
+    </div>`).join('');
+
+  el.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => decide(btn.dataset.id, btn.dataset.action));
+  });
+}
+
+async function decide(id, decision) {
+  try {
+    await ACOS.apiFetch(`/api/approval/${id}/decide`, { method:'PUT', body: { decision } });
+    load();
+  } catch (err) {
+    document.getElementById('page-error').textContent = err.message;
+    document.getElementById('page-error').hidden = false;
+  }
+}
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

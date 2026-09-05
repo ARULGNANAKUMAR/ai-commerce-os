@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Agents — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'workflows' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">My Agents</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="btn btn-secondary btn-sm" href="/templates">Browse templates</a>
+        <a class="btn btn-primary btn-sm" href="/builder">+ New agent</a>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+      <div id="wf-grid" class="wf-card-grid">
+        <div class="empty-state">
+          <div class="spinner" style="border-color:var(--color-border);border-top-color:var(--color-primary);width:32px;height:32px;margin:0 auto"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='workflows.js') }}"></script>
+</body>
+</html>

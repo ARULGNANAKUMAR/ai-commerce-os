@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Execution Logs — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='builder.css') }}">
+</head>
+<body>
+{% set active_page = 'executions' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Execution Logs</div>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+
+      <!-- Memory insights -->
+      <div class="card section-card" id="memory-card" style="margin-bottom:var(--space-5)" hidden>
+        <div class="section-card-header"><h3>🧠 Memory Engine — proven patterns</h3></div>
+        <p class="text-muted" style="font-size:13px;margin-bottom:var(--space-3)">Node sequences that have executed successfully before. Reused automatically to speed up future runs.</p>
+        <div id="memory-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-card-header" style="padding:var(--space-4) var(--space-5) 0">
+          <h3>Recent executions</h3>
+        </div>
+        <div class="product-table-wrap">
+          <table class="product-table" id="exec-table">
+            <thead><tr><th>Status</th><th>Workflow</th><th>Steps</th><th>Duration</th><th>Started</th><th></th></tr></thead>
+            <tbody id="exec-tbody"><tr><td colspan="6" class="table-loading">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="exec-modal-overlay" id="detail-modal" hidden>
+  <div class="exec-modal">
+    <div class="exec-modal-header"><h3>Execution detail</h3><button class="modal-close" id="detail-close-btn">✕</button></div>
+    <div class="exec-modal-body" id="detail-body"></div>
+    <div class="exec-modal-footer"><button class="btn btn-secondary btn-sm" id="detail-close-btn2">Close</button></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(async profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile);
+    ACOS.wireLogout(); ACOS.wireMobileSidebar();
+    loadExecutions();
+    loadMemory();
+
+    document.getElementById('detail-close-btn').addEventListener('click', () => document.getElementById('detail-modal').hidden = true);
+    document.getElementById('detail-close-btn2').addEventListener('click', () => document.getElementById('detail-modal').hidden = true);
+  });
+});
+
+async function loadExecutions() {
+  try {
+    const res = await ACOS.apiFetch('/api/executions?limit=30');
+    const execs = res.data.executions;
+    const tbody = document.getElementById('exec-tbody');
+    if (!execs.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="table-empty">No executions yet. Run a test from the <a href="/workflows">builder</a> to see logs here.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = execs.map(e => `
+      <tr>
+        <td>${statusBadge(e.status)}</td>
+        <td><code class="sku-code">${e.workflow_id.slice(-8)}</code></td>
+        <td>${e.step_count} steps</td>
+        <td>${e.duration_ms || 0}ms</td>
+        <td>${ACOS.formatRelativeTime(e.started_at)}</td>
+        <td><button class="btn btn-secondary btn-sm" data-id="${e.execution_id}">View</button></td>
+      </tr>`).join('');
+    tbody.querySelectorAll('button[data-id]').forEach(btn =>
+      btn.addEventListener('click', () => viewDetail(btn.dataset.id)));
+  } catch (err) {
+    document.getElementById('page-error').textContent = err.message || 'Failed to load executions.';
+    document.getElementById('page-error').hidden = false;
+  }
+}
+
+async function loadMemory() {
+  try {
+    const res = await ACOS.apiFetch('/api/agent/memory');
+    const insights = res.data.insights;
+    if (!insights.length) return;
+    document.getElementById('memory-card').hidden = false;
+    document.getElementById('memory-list').innerHTML = insights.map(i => `
+      <div class="activity-row">
+        <span class="activity-dot" style="background:var(--color-success)"></span>
+        <span class="activity-action" style="font-family:var(--font-mono);font-size:12px">${esc(i.pattern.replace(/→/g,' → '))}</span>
+        <span class="activity-time">${i.success_count} runs · avg ${i.avg_duration_ms}ms</span>
+      </div>`).join('');
+  } catch (e) { /* non-fatal */ }
+}
+
+async function viewDetail(id) {
+  document.getElementById('detail-modal').hidden = false;
+  document.getElementById('detail-body').innerHTML = '<div style="text-align:center;padding:var(--space-6)">Loading…</div>';
+  try {
+    const res = await ACOS.apiFetch(`/api/executions/${id}`);
+    const ex = res.data.execution;
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4)">
+        ${statusBadge(ex.status)}
+        <span style="font-size:12px;color:var(--color-text-faint)">${ex.duration_ms}ms · ${ACOS.formatRelativeTime(ex.started_at)}</span>
+      </div>
+      ${ex.error ? `<div class="banner banner-error">${esc(ex.error)}</div>` : ''}
+      ${(ex.steps||[]).map(s => `
+        <div class="exec-step step-${s.status}">
+          <div class="exec-step-num">${s.step}</div>
+          <div class="exec-step-info">
+            <div class="exec-step-label">${esc(s.node_label)}</div>
+            <div class="exec-step-type">${s.node_type}</div>
+          </div>
+          <div class="exec-step-ms">${s.duration_ms}ms</div>
+        </div>`).join('')}
+      ${ex.result ? `<div class="exec-result-box"><div style="font-weight:600;font-size:12px;margin-bottom:6px">Final result</div><pre>${esc(JSON.stringify(ex.result, null, 2).slice(0,1000))}</pre></div>` : ''}
+    `;
+  } catch (err) {
+    document.getElementById('detail-body').innerHTML = `<div class="banner banner-error">${esc(err.message)}</div>`;
+  }
+}
+
+function statusBadge(s) {
+  const map = { completed: 'badge-success', failed: 'badge-danger', awaiting_approval: 'badge-warning', running: 'badge-neutral' };
+  return `<span class="badge ${map[s]||'badge-neutral'}">${s.replace(/_/g,' ')}</span>`;
+}
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

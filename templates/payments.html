@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'payments' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Payments</div>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-warning">Razorpay Test Mode</span>
+      </div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error"   id="page-error"   hidden></div>
+      <div class="banner banner-success" id="page-success" hidden></div>
+
+      <!-- Test payment flow -->
+      <div class="card section-card" style="margin-bottom:var(--space-4)">
+        <div class="section-card-header"><h3>Test Payment Flow</h3></div>
+        <p class="text-muted" style="font-size:13px;margin-bottom:var(--space-4)">
+          Enter a session ID with an active cart to create a Razorpay Test Mode order, then simulate capture or failure.
+        </p>
+        <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="flex:1;min-width:200px;margin:0">
+            <label>Chat Session ID</label>
+            <input type="text" id="session-input" placeholder="sess_…">
+          </div>
+          <button class="btn btn-primary btn-sm" id="create-order-btn">Create order</button>
+        </div>
+        <div id="order-created-card" hidden style="margin-top:var(--space-4)">
+          <div class="card" style="padding:var(--space-4);background:var(--color-surface-sunken)">
+            <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px">Razorpay order created (Test Mode)</div>
+            <code id="razorpay-order-id" style="font-size:13px"></code>
+            <div style="display:flex;gap:8px;margin-top:var(--space-3)">
+              <button class="btn btn-primary btn-sm" id="simulate-success-btn">Simulate success</button>
+              <button class="btn btn-secondary btn-sm" id="simulate-fail-btn">Simulate failure</button>
+              <button class="btn btn-secondary btn-sm" id="retry-btn" disabled>Retry</button>
+              <button class="btn btn-danger-ghost btn-sm" id="refund-btn" disabled>Refund</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders table -->
+      <div class="card">
+        <div class="section-card-header" style="padding:var(--space-4) var(--space-5) 0"><h3>Orders</h3></div>
+        <div class="product-table-wrap">
+          <table class="product-table" id="orders-table">
+            <thead><tr><th>Order ID</th><th>Amount</th><th>Status</th><th>Retries</th><th>Created</th><th></th></tr></thead>
+            <tbody id="orders-tbody"><tr><td colspan="6" class="table-loading">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Webhook log -->
+      <div class="card section-card" style="margin-top:var(--space-4)">
+        <div class="section-card-header"><h3>Webhook Log</h3></div>
+        <div id="webhook-list"><div class="empty-state" style="padding:var(--space-4)"><p>Loading…</p></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='payments.js') }}"></script>
+</body>
+</html>

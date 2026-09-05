@@ -1,0 +1,112 @@
+{# templates/_sidebar.html
+   Included by every authenticated page. Set `active_page` variable
+   before including: {% set active_page = 'dashboard' %}
+#}
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <svg class="sidebar-logo-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="16" height="16" rx="5" fill="#3395FF"/>
+      <rect x="11" y="11" width="16" height="16" rx="5" fill="#6FB8FF" fill-opacity="0.85"/>
+    </svg>
+    AI Commerce OS
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-link {{ 'active' if active_page == 'dashboard' }}" href="/dashboard">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </a>
+
+    <div class="sidebar-section-label">Catalog</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'products' }}" href="/products">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a1 1 0 00-1 1v9a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Products
+    </a>
+
+    <div class="sidebar-section-label">AI Configuration</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'ai_settings' }}" href="/ai-settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="3"/><circle cx="5" cy="18" r="3"/><circle cx="19" cy="18" r="3"/><path d="M12 9v4M12 13l-5.5 3M12 13l5.5 3"/></svg>
+      AI Provider
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'permissions' }}" href="/permissions">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Permissions
+    </a>
+
+    <div class="sidebar-section-label">Agent Builder</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'workflows' }}" href="/workflows">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v3a3 3 0 003 3h6a3 3 0 003-3V9"/></svg>
+      My Agents
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'templates' }}" href="/templates">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'executions' }}" href="/executions">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Execution Logs
+    </a>
+
+    <div class="sidebar-section-label">AI Commerce</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'chat' }}" href="/chat">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      AI Shopping Chat
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'cart' }}" href="/cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      Cart
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'compare' }}" href="/compare">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v14a2 2 0 01-2 2H9m0-18v18M3 9v10a2 2 0 002 2h4"/></svg>
+      Compare
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'approvals' }}" href="/approvals">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Approvals
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'copilot' }}" href="/copilot">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Merchant Copilot
+    </a>
+
+    <div class="sidebar-section-label">Payments & Analytics</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'payments' }}" href="/payments">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      Payments
+    </a>
+    <a class="sidebar-link {{ 'active' if active_page == 'analytics' }}" href="/analytics">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+      Analytics
+    </a>
+
+    <div class="sidebar-section-label">Account</div>
+    <button class="sidebar-link disabled" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      Payments <span class="phase-tag">Phase 5</span>
+    </button>
+    <button class="sidebar-link disabled" type="button">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+      Analytics <span class="phase-tag">Phase 5</span>
+    </button>
+
+    <div class="sidebar-section-label">Account</div>
+    <a class="sidebar-link {{ 'active' if active_page == 'settings' }}" href="/settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.14.31.22.65.22 1H21a2 2 0 010 4h-.09c-.14.31-.22.65-.22 1z"/></svg>
+      Settings
+    </a>
+    <button class="sidebar-link" type="button" id="logout-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      Log out
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebar-avatar">?</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sidebar-user-name">Loading…</div>
+        <div class="sidebar-user-email" id="sidebar-user-email"></div>
+      </div>
+    </div>
+  </div>
+</aside>

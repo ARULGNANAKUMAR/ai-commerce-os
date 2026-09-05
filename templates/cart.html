@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'cart' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Cart</div>
+      </div>
+    </header>
+    <main class="content" style="max-width:640px">
+      <div class="banner banner-error"   id="page-error"   hidden></div>
+      <div class="banner banner-success" id="page-success" hidden></div>
+
+      <div id="no-session-notice" class="card empty-state" hidden>
+        <h4>No active chat session</h4>
+        <p>Start a conversation in <a href="/chat">AI Shopping Chat</a> and add items to see them here.</p>
+      </div>
+
+      <div id="cart-container" hidden>
+        <div class="card section-card">
+          <div class="section-card-header"><h3>Your items</h3></div>
+          <div id="cart-items"></div>
+        </div>
+        <div class="card" style="padding:var(--space-4);margin-top:var(--space-4)">
+          <div class="cart-summary-row"><span>Items</span><span id="summary-count">0</span></div>
+          <div class="cart-summary-row total"><span>Total</span><span id="summary-total">₹0</span></div>
+          <button class="btn btn-primary btn-block" id="checkout-btn" style="margin-top:var(--space-4)">Request checkout approval</button>
+        </div>
+        <div class="card settings-panel" id="approval-result-card" hidden style="margin-top:var(--space-4)"></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='cart.js') }}"></script>
+</body>
+</html>

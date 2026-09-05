@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+  {% set active_page = 'settings' %}
+<div class="app-shell" id="app-shell" data-requires-auth="true">
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      {% include '_sidebar.html' %}
+
+
+    <div class="main-col">
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap: var(--space-3);">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          </button>
+          <div class="topbar-title">Settings</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="banner banner-success" id="settings-success" hidden></div>
+        <div class="banner banner-error" id="settings-error" hidden></div>
+
+        <div class="settings-grid">
+          <nav class="settings-nav">
+            <button class="settings-nav-item active" data-panel="profile">Business profile</button>
+            <button class="settings-nav-item" data-panel="account">Account</button>
+            <button class="settings-nav-item" data-panel="security">Security</button>
+          </nav>
+
+          <div class="card settings-panel" id="panel-profile">
+            <h3>Business profile</h3>
+            <p class="panel-desc text-muted">This information is used across your dashboard and, from Phase 2 onward, can be shown to shoppers talking to your agent.</p>
+
+            <div class="avatar-upload-row">
+              <div class="avatar-placeholder" id="avatar-placeholder">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+              </div>
+              <div>
+                <button class="btn btn-secondary btn-sm" type="button" disabled title="Coming in Phase 2">Upload photo</button>
+                <div class="field-hint" style="margin-top:6px;">Profile photo uploads ship in Phase 2.</div>
+              </div>
+            </div>
+
+            <form id="profile-form" novalidate>
+              <div class="field-row">
+                <div class="field">
+                  <label for="merchant_name">Your name</label>
+                  <input type="text" id="merchant_name" name="merchant_name">
+                </div>
+                <div class="field">
+                  <label for="company_name">Company name</label>
+                  <input type="text" id="company_name" name="company_name">
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="phone">Phone</label>
+                  <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="field">
+                  <label for="business_type">Business type</label>
+                  <select id="business_type" name="business_type">
+                    <option value="">Select one</option>
+                    <option>Fashion &amp; Apparel</option>
+                    <option>Beauty &amp; Personal Care</option>
+                    <option>Electronics</option>
+                    <option>Home &amp; Living</option>
+                    <option>Food &amp; Beverage</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="settings-form-actions">
+                <button type="submit" class="btn btn-primary" id="profile-save-btn">Save changes</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="card settings-panel hidden" id="panel-account">
+            <h3>Account</h3>
+            <p class="panel-desc text-muted">Your login identity and verification status.</p>
+
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="account-email" disabled>
+            </div>
+            <div class="field">
+              <label>Email verification</label>
+              <div id="verify-status" style="margin-bottom:10px;"></div>
+              <button class="btn btn-secondary btn-sm" id="resend-verification-btn" type="button">Resend verification email</button>
+            </div>
+          </div>
+
+          <div class="card settings-panel hidden" id="panel-security">
+            <h3>Security</h3>
+            <p class="panel-desc text-muted">Manage how you sign in. Password changes sign you out everywhere.</p>
+            <div class="field">
+              <label>Reset your password</label>
+              <p style="margin:0 0 10px;">We'll send a reset link to your registered email address.</p>
+              <button class="btn btn-secondary btn-sm" id="reset-password-btn" type="button">Send password reset email</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentProfile = null;
+
+      ACOS.requireAuth().then((profile) => {
+        if (!profile) return;
+        currentProfile = profile;
+        ACOS.renderSidebarUser(profile);
+
+        const m = profile.merchant || {};
+        document.getElementById('merchant_name').value = m.merchant_name || '';
+        document.getElementById('company_name').value = m.company_name || '';
+        document.getElementById('phone').value = m.phone || '';
+        document.getElementById('business_type').value = m.business_type || '';
+
+        document.getElementById('account-email').value = profile.user.email;
+        const verifyStatus = document.getElementById('verify-status');
+        if (profile.user.email_verified) {
+          verifyStatus.innerHTML = '<span class="badge badge-success">Verified</span>';
+          document.getElementById('resend-verification-btn').hidden = true;
+        } else {
+          verifyStatus.innerHTML = '<span class="badge badge-warning">Not verified</span>';
+        }
+      });
+
+      // Tab switching
+      document.querySelectorAll('.settings-nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.settings-panel').forEach(p => p.classList.add('hidden'));
+          btn.classList.add('active');
+          document.getElementById('panel-' + btn.dataset.panel).classList.remove('hidden');
+        });
+      });
+
+      // Profile save
+      document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('profile-save-btn');
+        const errorBanner = document.getElementById('settings-error');
+        const successBanner = document.getElementById('settings-success');
+        errorBanner.hidden = true;
+        successBanner.hidden = true;
+        ACOS.setLoading(btn, true, 'Save changes');
+
+        try {
+          const payload = {
+            merchant_name: document.getElementById('merchant_name').value.trim(),
+            company_name: document.getElementById('company_name').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            business_type: document.getElementById('business_type').value,
+          };
+          const res = await ACOS.apiFetch('/api/merchant/profile', { method: 'PUT', body: payload });
+          successBanner.textContent = res.message || 'Profile updated.';
+          successBanner.hidden = false;
+          ACOS.renderSidebarUser({ user: currentProfile.user, merchant: res.data.merchant });
+        } catch (err) {
+          errorBanner.textContent = err.message || 'Could not save changes.';
+          errorBanner.hidden = false;
+        } finally {
+          ACOS.setLoading(btn, false, 'Save changes');
+        }
+      });
+
+      // Resend verification
+      document.getElementById('resend-verification-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('resend-verification-btn');
+        ACOS.setLoading(btn, true, 'Resend verification email');
+        try {
+          const res = await ACOS.apiFetch('/api/auth/resend-verification', { method: 'POST' });
+          const successBanner = document.getElementById('settings-success');
+          successBanner.textContent = res.message;
+          successBanner.hidden = false;
+        } catch (err) {
+          const errorBanner = document.getElementById('settings-error');
+          errorBanner.textContent = err.message;
+          errorBanner.hidden = false;
+        } finally {
+          ACOS.setLoading(btn, false, 'Resend verification email');
+        }
+      });
+
+      // Password reset
+      document.getElementById('reset-password-btn').addEventListener('click', async () => {
+        const btn = document.getElementById('reset-password-btn');
+        ACOS.setLoading(btn, true, 'Send password reset email');
+        try {
+          const res = await ACOS.apiFetch('/api/auth/forgot-password', {
+            method: 'POST',
+            body: { email: currentProfile.user.email },
+            skipAuth: true,
+          });
+          const successBanner = document.getElementById('settings-success');
+          successBanner.textContent = res.message;
+          successBanner.hidden = false;
+        } catch (err) {
+          const errorBanner = document.getElementById('settings-error');
+          errorBanner.textContent = err.message;
+          errorBanner.hidden = false;
+        } finally {
+          ACOS.setLoading(btn, false, 'Send password reset email');
+        }
+      });
+
+      ACOS.wireLogout();
+      ACOS.wireMobileSidebar();
+    });
+  </script>
+</body>
+</html>

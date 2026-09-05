@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'admin' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Admin Dashboard</div>
+      </div>
+      <div class="topbar-actions"><span class="badge badge-danger">Admin Only</span></div>
+    </header>
+    <main class="content">
+      <div class="banner banner-error" id="page-error" hidden></div>
+
+      <!-- Platform stats -->
+      <div class="metrics-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:var(--space-5)">
+        <div class="card metric-card">
+          <div class="metric-card-label">Total Merchants</div>
+          <div class="metric-card-value is-empty" id="stat-merchants">—</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-card-label">Platform Phase</div>
+          <div class="metric-card-value" id="stat-phase">5</div>
+        </div>
+        <div class="card metric-card">
+          <div class="metric-card-label">Usage Records</div>
+          <div class="metric-card-value is-empty" id="stat-usage">—</div>
+        </div>
+      </div>
+
+      <!-- Merchant list -->
+      <div class="card">
+        <div class="section-card-header" style="padding:var(--space-4) var(--space-5) 0"><h3>Merchants</h3></div>
+        <div class="product-table-wrap">
+          <table class="product-table">
+            <thead><tr><th>Company</th><th>Owner</th><th>Since</th><th>Orders</th><th>Workflows</th></tr></thead>
+            <tbody id="merchant-tbody"><tr><td colspan="5" class="table-loading">Checking admin access…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  ACOS.requireAuth().then(async profile => {
+    if (!profile) return;
+    ACOS.renderSidebarUser(profile); ACOS.wireLogout(); ACOS.wireMobileSidebar();
+
+    try {
+      const stats = await ACOS.apiFetch('/api/admin/stats');
+      document.getElementById('stat-merchants').textContent = stats.data.total_merchants;
+      document.getElementById('stat-merchants').classList.remove('is-empty');
+      document.getElementById('stat-usage').textContent = stats.data.usage_records;
+      document.getElementById('stat-usage').classList.remove('is-empty');
+
+      const mres = await ACOS.apiFetch('/api/admin/merchants');
+      const merchants = mres.data.merchants;
+      const tbody = document.getElementById('merchant-tbody');
+
+      if (!merchants.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="table-empty">No merchants yet.</td></tr>';
+        return;
+      }
+
+      // Load per-merchant details in parallel (capped at 5 for speed)
+      const rows = await Promise.all(merchants.slice(0, 20).map(async m => {
+        let orders = 0, wfs = 0;
+        try {
+          const oRes = await ACOS.apiFetch(`/api/admin/merchants/${m.id}/payments`);
+          orders = oRes.data.orders.length;
+          const wRes = await ACOS.apiFetch(`/api/admin/merchants/${m.id}/workflows`);
+          wfs = wRes.data.workflow_count;
+        } catch (e) {}
+        return { ...m, orders, wfs };
+      }));
+
+      tbody.innerHTML = rows.map(r => `<tr>
+        <td><strong>${esc(r.company_name || '—')}</strong></td>
+        <td>${esc(r.merchant_name || '—')}</td>
+        <td>${r.created_at ? ACOS.formatRelativeTime(r.created_at) : '—'}</td>
+        <td>${r.orders}</td>
+        <td>${r.wfs}</td>
+      </tr>`).join('');
+    } catch (err) {
+      document.getElementById('page-error').textContent =
+        err.status === 403 ? 'Admin access required. Your account email must be in ADMIN_EMAILS.' : (err.message || 'Failed to load admin data.');
+      document.getElementById('page-error').hidden = false;
+      document.getElementById('merchant-tbody').innerHTML = '<tr><td colspan="5" class="table-empty">Access denied</td></tr>';
+    }
+  });
+});
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Shopping Chat — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'chat' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">AI Shopping Chat</div>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge badge-neutral" id="lang-badge">EN</span>
+        <button class="btn btn-secondary btn-sm" id="new-session-btn">New conversation</button>
+      </div>
+    </header>
+
+    <div class="chat-shell">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg assistant">
+          <div class="chat-msg-avatar">🤖</div>
+          <div>
+            <div class="chat-msg-bubble">Hi! I'm your AI shopping assistant. Ask me to find products, compare options, get recommendations, or build your cart — in English, Tamil, or Tanglish.</div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-lang-pills">
+        <span class="chat-lang-pill" data-msg="Show me products under 2000">Try: search</span>
+        <span class="chat-lang-pill" data-msg="Compare them">Try: compare</span>
+        <span class="chat-lang-pill" data-msg="Recommend something for me">Try: recommend</span>
+        <span class="chat-lang-pill" data-msg="வணக்கம்">Try: தமிழ்</span>
+        <span class="chat-lang-pill" data-msg="earbuds venum">Try: Tanglish</span>
+      </div>
+      <form class="chat-input-bar" id="chat-form">
+        <input type="text" id="chat-input" placeholder="Ask me anything about products…" autocomplete="off">
+        <button type="submit" class="btn btn-primary" id="chat-send-btn">➤</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>

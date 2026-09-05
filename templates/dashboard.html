@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+  {% set active_page = 'dashboard' %}
+<div class="app-shell" id="app-shell" data-requires-auth="true">
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+      {% include '_sidebar.html' %}
+
+
+    <div class="main-col">
+      <header class="topbar">
+        <div style="display:flex; align-items:center; gap: var(--space-3);">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          </button>
+          <div class="topbar-title">Dashboard</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge badge-neutral" id="verify-badge" hidden>Email not verified</span>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="welcome-card">
+          <div class="welcome-card-text">
+            <h2 id="welcome-heading">Welcome to AI Commerce OS</h2>
+            <p>Your merchant workspace is set up. The AI agent builder, product catalog, and Razorpay payments unlock in Phase 2 — this foundation is what they'll plug into.</p>
+          </div>
+          <a class="btn btn-primary" href="/settings">Complete your profile</a>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="card metric-card">
+            <div class="metric-card-label">Conversations</div>
+            <div class="metric-card-value is-empty">—</div>
+            <div class="metric-card-hint">Live once an agent is published</div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-card-label">Conversion rate</div>
+            <div class="metric-card-value is-empty">—</div>
+            <div class="metric-card-hint">Tracked from agent checkouts</div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-card-label">Revenue via agent</div>
+            <div class="metric-card-value is-empty">₹ —</div>
+            <div class="metric-card-hint">Powered by Razorpay in Phase 2</div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-card-label">Active AI agents</div>
+            <div class="metric-card-value is-empty">0</div>
+            <div class="metric-card-hint">Build your first in Phase 3</div>
+          </div>
+          <div class="card metric-card">
+            <div class="metric-card-label">Products in catalog</div>
+            <div class="metric-card-value is-empty" id="metric-products">—</div>
+            <div class="metric-card-hint"><a href="/products">Manage catalog →</a></div>
+          </div>
+        </div>
+
+        <div class="card section-card">
+          <div class="section-card-header">
+            <h3>Recent activity</h3>
+          </div>
+          <div id="activity-list">
+            <div class="empty-state">
+              <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+              <h4>Nothing here yet</h4>
+              <p>Account activity — logins, profile updates, and later, agent conversations — will show up here.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      ACOS.requireAuth().then((profile) => {
+        if (!profile) return;
+        ACOS.renderSidebarUser(profile);
+
+        const merchantName = profile.merchant?.merchant_name || 'there';
+        document.getElementById('welcome-heading').textContent = `Welcome back, ${merchantName.split(' ')[0]}`;
+
+        if (!profile.user.email_verified) {
+          const badge = document.getElementById('verify-badge');
+          badge.hidden = false;
+          badge.textContent = 'Email not verified';
+        }
+
+        ACOS.apiFetch('/api/merchant/dashboard-summary').then((res) => {
+          const d = res.data;
+          const activity = d.recent_activity;
+          if (activity && activity.length) {
+            const list = document.getElementById('activity-list');
+            list.innerHTML = activity.map(a => `
+              <div class="activity-row">
+                <span class="activity-dot"></span>
+                <span class="activity-action">${ACOS.formatAction(a.action)}</span>
+                <span class="activity-time">${ACOS.formatRelativeTime(a.timestamp)}</span>
+              </div>
+            `).join('');
+          }
+          const pcEl = document.getElementById('metric-products');
+          if (pcEl && d.metrics && d.metrics.products) {
+            const v = d.metrics.products.value;
+            pcEl.textContent = v > 0 ? v : '0';
+            if (v > 0) pcEl.classList.remove('is-empty');
+          }
+        });
+      });
+
+      ACOS.wireLogout();
+      ACOS.wireMobileSidebar();
+    });
+  </script>
+</body>
+</html>

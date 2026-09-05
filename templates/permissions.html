@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permissions — AI Commerce OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+{% set active_page = 'permissions' %}
+<div class="app-shell">
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  {% include '_sidebar.html' %}
+
+  <div class="main-col">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:var(--space-3)">
+        <button class="mobile-menu-btn" id="mobile-menu-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div class="topbar-title">Agent Permissions</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="banner banner-error"   id="page-error"   hidden></div>
+      <div class="banner banner-success" id="page-success" hidden></div>
+
+      <div class="page-header">
+        <p class="text-muted" style="max-width:580px;margin:0">
+          Control exactly what your AI agent is allowed to do. Capabilities not explicitly enabled are denied by default. Financial capabilities require explicit limits.
+        </p>
+      </div>
+
+      <!-- Sandbox tester -->
+      <div class="card section-card" style="margin-bottom:var(--space-5)">
+        <div class="section-card-header">
+          <h3>Permission sandbox tester</h3>
+        </div>
+        <p class="text-muted" style="font-size:13.5px;margin-bottom:var(--space-4)">Test what decision the engine would return for a given capability and context.</p>
+        <div style="display:flex;gap:var(--space-3);align-items:flex-end;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:160px;margin:0">
+            <label for="test-capability">Capability</label>
+            <select id="test-capability"><option value="">Select…</option></select>
+          </div>
+          <div class="field" style="min-width:140px;margin:0" id="test-amount-field" hidden>
+            <label for="test-amount">Amount (₹)</label>
+            <input type="number" id="test-amount" min="0" step="1" placeholder="1000">
+          </div>
+          <button class="btn btn-secondary" id="test-check-btn" style="margin-bottom:0">Check</button>
+        </div>
+        <div class="permission-decision" id="permission-decision" hidden></div>
+      </div>
+
+      <!-- Capability groups -->
+      <div id="capabilities-container">
+        <div class="empty-state"><div class="spinner" style="border-color:var(--color-border);border-top-color:var(--color-primary);margin:0 auto"></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='permissions.js') }}"></script>
+</body>
+</html>
